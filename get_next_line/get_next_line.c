@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: efumiko <efumiko@student.21-school.ru>     +#+  +:+       +#+        */
+/*   By: ddraco <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/18 13:44:08 by ddraco            #+#    #+#             */
-/*   Updated: 2020/11/28 22:36:57 by efumiko          ###   ########.fr       */
+/*   Updated: 2020/12/31 12:57:11 by ddraco           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,16 @@ char			*valid(char **line, size_t size, int fd)
 		return (buf);
 }
 
+void			search_n(char **p, char **buf, char **rem)
+{
+	if ((*p = ft_strchr(*buf, '\n')))
+	{
+		*(*p) = '\0';
+		free(*rem);
+		*rem = ft_strdup(++(*p));
+	}
+}
+
 int				get_next_line(int fd, char **line)
 {
 	int			was_read;
@@ -67,20 +77,18 @@ int				get_next_line(int fd, char **line)
 	if (!(buf = valid(line, BUFFER_SIZE, fd)))
 		return (-1);
 	p = rem_ch(&rem, line);
-	while (!p && (was_read = (int)read(fd, buf, BUFFER_SIZE)))
+	while ((!p && (was_read = (int)read(fd, buf, BUFFER_SIZE))) \
+	|| ((ft_strcmp(*line, "") != 0) && (was_read == 0)))
 	{
 		buf[was_read] = '\0';
-		if ((p = ft_strchr(buf, '\n')))
-		{
-			*p = '\0';
-			free(rem);
-			rem = ft_strdup(++p);
-		}
+		search_n(&p, &buf, &rem);
 		tmp = *line;
 		if (!(*line = ft_strjoin(*line, buf)) || was_read < 0)
 			return (-1);
 		free(tmp);
 	}
 	free(buf);
+	if (was_read == 0)
+		return (-2);
 	return (p) ? 1 : 0;
 }

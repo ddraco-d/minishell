@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddraco <ddraco@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ddraco <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/28 16:45:08 by ddraco            #+#    #+#             */
-/*   Updated: 2020/12/14 17:12:14 by ddraco           ###   ########.fr       */
+/*   Created: 2020/12/31 00:35:02 by efumiko           #+#    #+#             */
+/*   Updated: 2020/12/31 13:03:59 by ddraco           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,44 +15,84 @@
 #include <errno.h>
 #include <stdio.h>
 
-int main(int argc, char **argv, char **envp)
+t_data		*g_vars;
+
+t_data		*ft_init(char **content)
 {
-    //char **args_for_commands;
-    //OS_ACTIVITY_DT_MODE=enable
-    // char    *line = "echo '123\'";
-    //echo ; ech'ab    co'   23
-    argc = 0;
-    argv = NULL;
-    char    *line = "   echo \"\\hello \\$PWD $PWD\" ; hi how are you; $HOME";
-    // char    *line;
-    t_data  vars;
-    vars.err_status = 0;
-    vars.envp = ft_strdup_2arr(envp);
-    
-    int i = 0;
-    int check = get_amount_line(envp);
-    // while (i < check)
-    // {
-    //     printf("%s\n", vars.envp[i]);
-    //     i++;
-    // }
-    
-    // get_next_line(0, &line);
-    parser(line, &vars);
-    // free(line);
-    
-    // while (get_next_line(0, &line) > 0)
-    // {
-    //     parser(line, vars);
-    //     free(line);
-    // }
-    
-    check = get_amount_line(vars.args);
-    while (i < check)
-    {
-        printf("%s\n", vars.args[i]);
-        i++;
-    }
-    ft_free_array(&vars.args);
-    ft_free_array(&vars.envp);
+	t_data	*new;
+
+	new = (t_data*)malloc(sizeof(t_data));
+	if (new == NULL)
+		return (NULL);
+	new->args = NULL;
+	new->envp = ft_strdup_2arr((char **)content);
+	new->pipe = NULL;
+	new->redirects = NULL;
+	new->err_status = 0;
+	new->pid = 0;
+	new->signal = 0;
+	return (new);
+}
+
+void		init_structure(t_data *g_vars)
+{
+	g_vars->fd0 = dup(0);
+	g_vars->fd1 = dup(1);
+}
+
+void		sig_int(int sig)
+{
+	(void)sig;
+	if (g_vars->pid == 0)
+	{
+		ft_putstr_fd("\b\b  ", 2);
+		ft_putstr_fd("\n", 2);
+		ft_putstr_fd("minishell: ", 2);
+		g_vars->err_status = 1;
+	}
+	else
+	{
+		ft_putstr_fd("\n", 2);
+		g_vars->signal = 1;
+		g_vars->err_status = 130;
+	}
+}
+
+void		sig_quit(int code)
+{
+	if (g_vars->pid != 0)
+	{
+		ft_putstr_fd("Quit: ", 2);
+		ft_putnbr_fd(code, 2);
+		ft_putchar_fd('\n', 2);
+		g_vars->err_status = 131;
+		g_vars->signal = 1;
+	}
+	else
+		ft_putstr_fd("\b\b  \b\b", 2);
+}
+
+int			main(int argc, char **argv, char **envp)
+{
+	int		gnl_ret;
+	char	*line;
+
+	(void)argc;
+	(void)argv;
+	g_vars = ft_init(envp);
+	init_structure(g_vars);
+	signal(SIGQUIT, &sig_quit);
+	signal(SIGINT, &sig_int);
+	ft_putstr_fd("minishell: ", 1);
+	while ((gnl_ret = get_next_line(0, &line)) > 0)
+	{
+		start(line, g_vars);
+		free(line);
+		ft_putstr_fd("minishell: ", 1);
+	}
+	free(line);
+	if (gnl_ret == -2)
+		ft_putstr_fd("exit\n", 2);
+	ft_free_array(&g_vars->envp);
+	free(g_vars);
 }

@@ -1,41 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   echo.c                                             :+:      :+:    :+:   */
+/*   error_message2.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: efumiko <efumiko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/28 16:45:36 by efumiko           #+#    #+#             */
-/*   Updated: 2021/01/04 11:30:38 by efumiko          ###   ########.fr       */
+/*   Created: 2020/12/26 17:50:38 by efumiko           #+#    #+#             */
+/*   Updated: 2020/12/26 18:10:09 by efumiko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int	ft_echo(t_data *data)
+void	error_message_rel_path(t_data *vars, int f_no_dir_and_exist, \
+							int f_have_rights)
 {
-	int i;
-	int flag;
-
-	i = 0;
-	flag = 0;
-	if (!(data->args[1]))
+	if (f_no_dir_and_exist == 0)
 	{
-		ft_putchar_fd('\n', 1);
-		return (0);
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(vars->args[0], 2);
+		ft_putstr_fd(": command not found\n", 2);
 	}
-	while (data->args[++i])
+	else if (f_have_rights == 0)
 	{
-		if (ft_strncmp(data->args[i], "-n", 3) == 0)
-		{
-			flag = 1;
-			continue ;
-		}
-		ft_putstr_fd(data->args[i], 1);
-		if (data->args[i + 1])
-			ft_putstr_fd(" ", 1);
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(vars->args[0], 2);
+		ft_putstr_fd(": Permission denied\n", 2);
 	}
-	if (!flag)
-		ft_putstr_fd("\n", 1);
-	return (0);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   array_utils3.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: efumiko <efumiko@student.21-school.ru>     +#+  +:+       +#+        */
+/*   By: ddraco <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/12 20:40:19 by efumiko           #+#    #+#             */
-/*   Updated: 2020/12/12 20:41:37 by efumiko          ###   ########.fr       */
+/*   Updated: 2021/01/05 12:17:40 by ddraco           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ void	insertion_sort(char **mass, int n)
 
 char	*get_name_var_from_arg(char *argument)
 {
-	int		res_len;
 	int		i;
 	char	*name_var;
 
@@ -71,4 +70,48 @@ void	replace_elem_in_envp(char **src, char *name_variable, char *replace)
 		}
 		i++;
 	}
+}
+
+int		in_commas(char *line, int symb_id, char comma_type)
+{
+	int	check1;
+	int	check2;
+	int	i;
+	int	line_len;
+
+	i = 0;
+	check1 = -1;
+	check2 = -1;
+	line_len = ft_strlen(line);
+	while (i < line_len)
+	{
+		if (line[i] == comma_type && check1 != -1)
+			check2 = i;
+		else if (line[i] == comma_type)
+			check1 = i;
+		if (check1 != -1 && check2 != -1)
+		{
+			if (symb_id > check1 && symb_id < check2)
+				return (1);
+			check1 = -1;
+			check2 = -1;
+		}
+		i++;
+	}
+	return (0);
+}
+
+int		in_screening(char *line, int symb_id)
+{
+	int	iterator;
+
+	iterator = symb_id;
+	if (line[symb_id - 1] == '\\')
+	{
+		while (iterator > 0 && line[iterator] == '\\')
+			iterator--;
+		if ((symb_id - iterator) % 2 != 0)
+			return (1);
+	}
+	return (0);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: efumiko <efumiko@student.21-school.ru>     +#+  +:+       +#+        */
+/*   By: efumiko <efumiko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/04 17:42:37 by efumiko           #+#    #+#             */
-/*   Updated: 2020/12/12 22:57:09 by efumiko          ###   ########.fr       */
+/*   Updated: 2020/12/26 18:01:24 by efumiko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,11 @@ void		change_oldpwd(t_data *data, char *old_pwd)
 {
 	char *tmp;
 
-	if (find_elem_in_arrayStr(data->envp, "OLDPWD=", 1))
-		data->envp = delete_elem_in_arrayStr(data->envp, "OLDPWD=", 1);
+	if (find_elem_in_arraystr(data->envp, "OLDPWD=", 1))
+		data->envp = delete_elem_in_arraystr(data->envp, "OLDPWD=", 1);
 	tmp = old_pwd;
 	old_pwd = ft_strjoin("OLDPWD=", old_pwd);
-	data->envp = add_elem_in_arrayStr(data->envp, old_pwd);
+	data->envp = add_elem_in_arraystr(data->envp, old_pwd);
 	free(tmp);
 	free(old_pwd);
 }
@@ -31,11 +31,11 @@ void		change_pwd(t_data *data)
 	char *tmp;
 
 	pwd = getcwd(NULL, 0);
-	if (find_elem_in_arrayStr(data->envp, "PWD=", 1))
-		data->envp = delete_elem_in_arrayStr(data->envp, "PWD=", 1);
+	if (find_elem_in_arraystr(data->envp, "PWD=", 1))
+		data->envp = delete_elem_in_arraystr(data->envp, "PWD=", 1);
 	tmp = pwd;
 	pwd = ft_strjoin("PWD=", pwd);
-	data->envp = add_elem_in_arrayStr(data->envp, pwd);
+	data->envp = add_elem_in_arraystr(data->envp, pwd);
 	free(pwd);
 	free(tmp);
 }
@@ -47,7 +47,7 @@ int			without_arguments_handler(t_data *data, char *old_pwd)
 	home_path = get_value_from_var(data->envp, "HOME=");
 	if (!home_path)
 	{
-		ft_putstr_fd("cd: HOME not set\n", 2);
+		ft_putstr_fd("minishell: cd: HOME not set\n", 2);
 		return (1);
 	}
 	if (ft_strlen(home_path) == 0)
@@ -69,7 +69,7 @@ int			minus_handler(t_data *data, char *current_pwd)
 	value_of_old_pwd = get_value_from_var(data->envp, "OLDPWD=");
 	if (!value_of_old_pwd)
 	{
-		ft_putstr_fd("cd: OLDPWD not set\n", 2);
+		ft_putstr_fd("minishell: cd: OLDPWD not set\n", 2);
 		return (1);
 	}
 	if (ft_strlen(value_of_old_pwd) == 0)
@@ -92,7 +92,6 @@ int			minus_handler(t_data *data, char *current_pwd)
 int			ft_cd(t_data *data)
 {
 	char *current_pwd;
-	char *home;
 
 	current_pwd = getcwd(NULL, 0);
 	if (!data->args[1])
